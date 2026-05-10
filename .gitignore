@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+
+# Build output
+build/
+dist/
+*.spec
+
+# Logs
+*.log
+output.txt
+error.log
+
+# IDE
+.vscode/
+.idea/
+
+# PyInstaller
+*.spec
+
+# OS
+Thumbs.db
+.DS_Store

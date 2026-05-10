@@ -1,0 +1,6 @@
+PyQt6
+PyQt6-QtSvg
+pywin32
+PyQt6-Frameless-Window
+PyQt6-Fluent-Widgets
+PyInstaller
