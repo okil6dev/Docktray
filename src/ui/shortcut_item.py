@@ -1,4 +1,5 @@
 import os
+import subprocess
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QToolButton
 from PyQt6.QtCore import pyqtSignal, Qt, QSize
 from PyQt6.QtGui import QCursor, QIcon
@@ -8,12 +9,14 @@ from .ui_utils import svg_to_icon, ICONS
 class ShortcutItem(QWidget):
     deleted = pyqtSignal(str)
 
-    def __init__(self, path, name, parent=None):
+    def __init__(self, path, name, icon_size=45, parent=None):
         super().__init__(parent)
         self.path = path
         self.name = name
-        
-        self.setFixedSize(100, 120)
+        self.icon_size = int(icon_size)
+        self._base_pixmap = None
+
+        self._apply_geometry_from_icon_size()
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         
         self.layout = QVBoxLayout(self)
@@ -23,17 +26,26 @@ class ShortcutItem(QWidget):
         
         # Icon Container
         self.icon_container = QWidget(self)
-        self.icon_container.setFixedSize(70, 70)
+        self.icon_container.setFixedSize(self.icon_container_size, self.icon_container_size)
         self.icon_layout = QVBoxLayout(self.icon_container)
         self.icon_layout.setContentsMargins(0, 0, 0, 0)
         
         self.icon_label = QLabel(self.icon_container)
         self.icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.icon_label.setFixedSize(70, 70)
+        self.icon_label.setFixedSize(self.icon_container_size, self.icon_container_size)
         
         pixmap = get_icon(path, 'large')
         if pixmap and not pixmap.isNull():
-            self.icon_label.setPixmap(pixmap.scaled(45, 45, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+            self._base_pixmap = pixmap
+            self._apply_icon_size()
+        elif path.startswith("uwp:") or path.startswith("startapp:"):
+            icon = svg_to_icon(ICONS["windows_apps"], "#4fc3f7")
+            fallback = icon.pixmap(self.icon_size, self.icon_size)
+            if not fallback.isNull():
+                self._base_pixmap = fallback
+                self._apply_icon_size()
+            else:
+                self.icon_label.setText("UWP")
         else:
             self.icon_label.setText("?")
             
@@ -56,7 +68,7 @@ class ShortcutItem(QWidget):
         self.delete_btn.setIconSize(QSize(16, 16))
         self.delete_btn.setFixedSize(24, 24)
         # Position at top-right of the icon area
-        self.delete_btn.move(70, 5)
+        self.delete_btn.move(self.delete_btn_x, 5)
         self.delete_btn.hide()
         self.delete_btn.clicked.connect(self._on_delete_clicked)
         self.delete_btn.setStyleSheet("""
@@ -80,6 +92,33 @@ class ShortcutItem(QWidget):
             }
         """)
 
+    def _apply_geometry_from_icon_size(self):
+        # Keep size relationships stable while scaling hitbox with icon size.
+        self.icon_container_size = max(52, self.icon_size + 24)
+        self.tile_width = max(86, self.icon_size + 56)
+        self.tile_height = max(102, self.icon_size + 74)
+        self.delete_btn_x = self.icon_container_size - 2
+        self.setFixedSize(self.tile_width, self.tile_height)
+
+    def _apply_icon_size(self):
+        if self._base_pixmap and not self._base_pixmap.isNull():
+            self.icon_label.setPixmap(
+                self._base_pixmap.scaled(
+                    self.icon_size,
+                    self.icon_size,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+            )
+
+    def set_icon_size(self, size):
+        self.icon_size = int(size)
+        self._apply_geometry_from_icon_size()
+        self.icon_container.setFixedSize(self.icon_container_size, self.icon_container_size)
+        self.icon_label.setFixedSize(self.icon_container_size, self.icon_container_size)
+        self.delete_btn.move(self.delete_btn_x, 5)
+        self._apply_icon_size()
+
     def enterEvent(self, event):
         self.delete_btn.show()
         super().enterEvent(event)
@@ -96,6 +135,12 @@ class ShortcutItem(QWidget):
         super().mouseReleaseEvent(event)
 
     def _launch_app(self):
+        if self.path.startswith("uwp:") or self.path.startswith("startapp:"):
+            app_id = self.path.split(":", 1)[1]
+            if app_id:
+                subprocess.Popen(["explorer.exe", f"shell:AppsFolder\\{app_id}"])
+            return
+
         if os.path.exists(self.path):
             os.startfile(self.path)
 

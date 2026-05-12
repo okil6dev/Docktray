@@ -20,7 +20,7 @@ def get_resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 def get_app_icon():
-    icon_path = get_resource_path("icons/icon.ico")
+    icon_path = get_resource_path("icons/app/icon.ico")
     if os.path.exists(icon_path):
         return QIcon(icon_path)
     
@@ -31,6 +31,14 @@ def get_app_icon():
 
 
 def main():
+    # Set AppUserModelID at the START - before any window creation
+    # This must be here, not in settings_window, to prevent conflicts
+    try:
+        import ctypes
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("DockTray.Launcher.1")
+    except Exception:
+        pass
+    
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
     

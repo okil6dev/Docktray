@@ -14,11 +14,14 @@ def build():
     # --name: Name of the exe
     # --add-data: Include the src directory
     # --clean: Clean cache before building
+    # --hidden-import: Ensure PyInstaller finds all submodules
     
     # Use absolute paths to ensure PyInstaller finds everything
-    icon_path = os.path.abspath("icons/icon.ico")
+    icon_path = os.path.abspath("icons/app/icon.ico")
     src_path = os.path.abspath("src")
-    icons_dir = os.path.abspath("icons")
+    icons_app_dir = os.path.abspath("icons/app")
+    icons_projects_dir = os.path.abspath("icons/projects")
+    icons_settings_dir = os.path.abspath("icons/settings_icon")
     
     command = [
         sys.executable,
@@ -29,7 +32,11 @@ def build():
         "--name=DockTray",
         f"--icon={icon_path}",
         f"--add-data={src_path};src",
-        f"--add-data={icons_dir};icons",
+        f"--add-data={icons_app_dir};icons/app",
+        f"--add-data={icons_projects_dir};icons/projects",
+        f"--add-data={icons_settings_dir};icons/settings_icon",
+        "--hidden-import=PyQt6_Frameless_Window",
+        "--hidden-import=PyQt6_Fluent_Widgets",
         "--clean",
         main_script
     ]

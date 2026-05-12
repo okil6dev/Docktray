@@ -7,12 +7,12 @@ class ConfigManager:
     @staticmethod
     def _load_full_config():
         if not os.path.exists(CONFIG_FILE):
-            return {"shortcuts": [], "settings": {"theme": "dark"}}
+            return {"shortcuts": [], "settings": {"theme_whiteness": 0}}
         try:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
-            return {"shortcuts": [], "settings": {"theme": "dark"}}
+            return {"shortcuts": [], "settings": {"theme_whiteness": 0}}
 
     @staticmethod
     def _save_full_config(config):

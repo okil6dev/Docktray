@@ -1,9 +1,15 @@
 {
     "shortcuts": [],
     "settings": {
-        "theme": "acrylic_light",
-        "taskbar_position": "Right Taskbar (Vertical)",
-        "icon_color": "black",
-        "acrylic_opacity": 1
+        "theme_mode": "acrylic",
+        "theme_whiteness": 100,
+        "taskbar_position": "Bottom Taskbar",
+        "icon_color": "white",
+        "acrylic_opacity": 1,
+        "shortcut_icon_size": 45,
+        "launcher_button_size": 40,
+        "tray_width": 492,
+        "tray_height": 291,
+        "disable_acrylic_overlay": false
     }
 }
