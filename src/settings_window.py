@@ -7,8 +7,9 @@ from PyQt6.QtWidgets import QWidget, QApplication, QLabel, QPushButton, QFileDia
 
 from qfluentwidgets import (FluentWindow, NavigationItemPosition, FluentIcon as FIF,
                             SettingCardGroup, SettingCard, ComboBox, Slider, CheckBox,
-                            ScrollArea, ExpandLayout, qconfig, isDarkTheme)
+                            ScrollArea, ExpandLayout, qconfig, isDarkTheme, SwitchButton)
 from src.core.config_manager import ConfigManager
+from src.core.startup_manager import StartupManager
 
 # Determine base path (works for dev and PyInstaller builds)
 if hasattr(sys, '_MEIPASS'):
@@ -59,6 +60,42 @@ try:
     WIN32_AVAILABLE = True
 except ImportError:
     WIN32_AVAILABLE = False
+
+
+class GeneralInterface(ScrollArea):
+    """ General settings interface - startup, etc. """
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        self.view = QWidget(self)
+        self.expand_layout = ExpandLayout(self.view)
+
+        self.setObjectName("GeneralInterface")
+        self.view.setObjectName("GeneralInterfaceView")
+
+        self.generalGroup = SettingCardGroup("General", self.view)
+
+        # Startup card
+        self.startupCard = SettingCard(
+            FIF.SETTING,
+            "Start on Startup",
+            "Automatically start DockTray when you log in to Windows",
+            self.generalGroup
+        )
+        self.startupSwitch = SwitchButton(self.startupCard)
+        self.startupSwitch.setChecked(StartupManager.is_startup_enabled())
+        self.startupSwitch.checkedChanged.connect(StartupManager.set_startup)
+
+        self.startupCard.hBoxLayout.addWidget(self.startupSwitch, 0, Qt.AlignmentFlag.AlignRight)
+        self.startupCard.hBoxLayout.addSpacing(16)
+
+        self.generalGroup.addSettingCard(self.startupCard)
+        self.expand_layout.addWidget(self.generalGroup)
+
+        self.setWidget(self.view)
+        self.setWidgetResizable(True)
+
+        self.setStyleSheet("QScrollArea { background: transparent; border: none; }")
+        self.view.setStyleSheet("background: transparent;")
 
 
 class ThemeInterface(ScrollArea):
@@ -545,11 +582,13 @@ class SettingsWindow(FluentWindow):
         if self._settings_icon is None or self._settings_icon.isNull():
             self._settings_icon = FIF.SETTING.icon()
 
+        self.generalInterface = GeneralInterface(self)
         self.themeInterface = ThemeInterface(self)
         self.positionInterface = PositionInterface(self)
         self.exportInterface = ExportInterface(self)
 
         self.addSubInterface(self.themeInterface, FIF.PALETTE, "Themes")
+        self.addSubInterface(self.generalInterface, FIF.SETTING, "General")
         self.addSubInterface(self.positionInterface, FIF.MOVE, "Positioning")
         self.addSubInterface(self.exportInterface, FIF.SAVE, "Exporting")
 

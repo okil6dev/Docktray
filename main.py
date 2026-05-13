@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PyQt6.QtGui import QIcon, QPixmap, QColor, QPainter
 from PyQt6.QtCore import Qt, pyqtSlot
 from src.ui.launcher_window import LauncherWindow
+from src.core.startup_manager import StartupManager
 
 def get_resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """

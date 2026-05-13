@@ -8,8 +8,8 @@
         "acrylic_opacity": 1,
         "shortcut_icon_size": 45,
         "launcher_button_size": 40,
-        "tray_width": 492,
-        "tray_height": 291,
+        "tray_width": 406,
+        "tray_height": 349,
         "disable_acrylic_overlay": false
     }
 }
