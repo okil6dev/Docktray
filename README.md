@@ -6,7 +6,7 @@ A lightweight, translucent **launcher & quick-access dock** for Windows, built w
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white">
   <img alt="PyQt6" src="https://img.shields.io/badge/PyQt6-6.5%2B-41CD52?logo=qt&logoColor=white">
   <img alt="Platform" src="https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D6?logo=windows&logoColor=white">
-  <img alt="License" src="https://img.shields.io/badge/License-MIT-green">
+  <img alt="License" src="https://img.shields.io/badge/License-CC0%201.0-lightgrey">
   <img alt="Build" src="https://img.shields.io/badge/Build-PyInstaller-orange?logo=python&logoColor=white">
 </p>
 
@@ -220,7 +220,7 @@ Please keep the existing theme/translucency comments up to date if you change ac
 
 ## License
 
-MIT — do whatever you like, but please don't blame us if it eats your Start menu.
+CC0 1.0 Universal (Public Domain Dedication). Do whatever you like with this — copy it, fork it, ship it, sell it, claim it, remix it. No attribution required, no warranty, no strings attached. If it eats your Start menu, that's on you.
 
 ---
 
