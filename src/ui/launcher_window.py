@@ -980,8 +980,15 @@ class LauncherWindow(AcrylicWindow):
 
         icon_size = int(ConfigManager.get_setting("shortcut_icon_size", 45))
         for s in shortcuts:
-            item = ShortcutItem(s["path"], s["name"], icon_size=icon_size)
+            item = ShortcutItem(
+                s["path"],
+                s["name"],
+                icon_size=icon_size,
+                custom_icon=s.get("custom_icon"),
+                custom_name=s.get("custom_name"),
+            )
             item.deleted.connect(self._remove_shortcut)
+            item.customDataChanged.connect(self._on_shortcut_custom_data_changed)
             self.flow_layout.addWidget(item)
 
     def _add_file(self):
@@ -1075,6 +1082,19 @@ class LauncherWindow(AcrylicWindow):
     def _remove_shortcut(self, path):
         if ConfigManager.remove_shortcut(path):
             self.load_shortcuts()
+
+    def _on_shortcut_custom_data_changed(self, path):
+        """Persist any new custom_icon / custom_name set via the right-click
+        menu on a ShortcutItem. The matching item is still in the layout, so
+        we read its current custom values and write them to config.json."""
+        for i in range(self.flow_layout.count()):
+            widget = self.flow_layout.itemAt(i).widget()
+            if isinstance(widget, ShortcutItem) and widget.path == path:
+                ConfigManager.update_shortcut(path, {
+                    "custom_icon": widget.custom_icon_path,
+                    "custom_name": widget.custom_name,
+                })
+                return
 
     # Drag and Drop functionality
     def dragEnterEvent(self, event):

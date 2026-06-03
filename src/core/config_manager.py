@@ -40,12 +40,12 @@ class ConfigManager:
         for s in shortcuts:
             if s["path"] == path:
                 return False
-        
+
         if not name:
             name = os.path.basename(path)
             if not name:
                 name = path
-                
+
         shortcuts.append({
             "path": path,
             "name": name
@@ -60,6 +60,28 @@ class ConfigManager:
         if len(new_shortcuts) != len(shortcuts):
             ConfigManager.save_shortcuts(new_shortcuts)
             return True
+        return False
+
+    @staticmethod
+    def update_shortcut(path, updates):
+        """Update fields on an existing shortcut (e.g. custom_icon, custom_name).
+        The whole entry is replaced for the matching path so any keys not in
+        `updates` are preserved, while keys explicitly set to None are removed
+        (used to clear custom values).
+        """
+        config = ConfigManager._load_full_config()
+        shortcuts = config.get("shortcuts", [])
+        for i, s in enumerate(shortcuts):
+            if s.get("path") == path:
+                for key, value in updates.items():
+                    if value is None:
+                        s.pop(key, None)
+                    else:
+                        s[key] = value
+                shortcuts[i] = s
+                config["shortcuts"] = shortcuts
+                ConfigManager._save_full_config(config)
+                return True
         return False
 
     @staticmethod

@@ -48,6 +48,12 @@ Additional appearance controls:
   - Uses `QImage.fromHICON` and smooth `QPixmap.scaled` for pixel-perfect results.
 - **De-duplication** — adding the same shortcut twice is a silent no-op.
 - **Hover delete** — hover any shortcut to reveal a small trash button; click to remove.
+- **Right-click menu** for per-item customisation:
+  - **Set Custom Name...** — override the display name. Leave blank or pick the original to reset.
+  - **Set Custom Icon...** — pick any `.png`, `.ico`, `.jpg`, `.bmp`, `.gif`, or `.webp` file to use as the icon.
+  - **Reset Custom Name / Reset Custom Icon** — clear the override and fall back to the original.
+  - **Delete** — remove the shortcut (any custom data is wiped at the same time).
+  - A small blue **C** badge appears in the bottom-right of the tile while any custom data is active.
 - **Single-click launch** with a click cursor, plus a fallback "?" / "UWP" badge when an icon cannot be resolved.
 - **Custom icon size** — slider from **28 px to 72 px**, with tile geometry scaling proportionally.
 - **Custom bottom-bar button size** — slider from **32 px to 56 px**, icons scale automatically.
