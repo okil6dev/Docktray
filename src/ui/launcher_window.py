@@ -526,17 +526,17 @@ class LauncherWindow(AcrylicWindow):
                 base = "FFFFFF"
             elif whiteness >= 90:
                 # For high whiteness (90-99), use minimal opacity for maximum color passthrough
-                # Further reduced scaling factor (1.2 -> 0.8)
-                opacity = max(1, min(255, int(value * 0.8)))
+                # 50% of original scaling factor (0.8 -> 0.4)
+                opacity = max(1, min(255, int(value * 0.4)))
                 ratio = whiteness / 100.0
                 r = int(0x20 + (0xFA - 0x20) * ratio)
                 g = int(0x20 + (0xFA - 0x20) * ratio)
                 b = int(0x20 + (0xFA - 0x20) * ratio)
                 base = f"{r:02x}{g:02x}{b:02x}"
             else:
-                # For lower whiteness, use even lower scaling for maximum transparency
-                # Further reduced scaling factor (6 -> 3)
-                opacity = max(1, min(255, int(value * 3)))
+                # For lower whiteness, use 50% of original scaling
+                # 50% of original scaling factor (3 -> 1.5)
+                opacity = max(1, min(255, int(value * 1.5)))
                 ratio = whiteness / 100.0
                 r = int(0x20 + (0xFA - 0x20) * ratio)
                 g = int(0x20 + (0xFA - 0x20) * ratio)
@@ -545,7 +545,7 @@ class LauncherWindow(AcrylicWindow):
 
             # For 100% whiteness, use minimal opacity setting
             if whiteness >= 100:
-                opacity = max(1, min(255, int(value * 0.8)))
+                opacity = max(1, min(255, int(value * 0.4)))
             alpha = f"{opacity:02x}"
 
             color = f"{base}{alpha}"
@@ -810,17 +810,17 @@ class LauncherWindow(AcrylicWindow):
                 base_color = "FFFFFF"
             elif whiteness >= 90:
                 # For high whiteness (90-99), use minimal opacity for maximum color passthrough
-                # Ultra-transparent scaling factor (2.55 -> 0.8)
-                opacity = max(1, min(255, int(saved_opacity * 0.8)))
+                # 50% of original scaling factor (0.8 -> 0.4)
+                opacity = max(1, min(255, int(saved_opacity * 0.4)))
                 ratio = whiteness / 100.0
                 r = int(0x20 + (0xFF - 0x20) * ratio)
                 g = int(0x20 + (0xFF - 0x20) * ratio)
                 b = int(0x20 + (0xFF - 0x20) * ratio)
                 base_color = f"{r:02x}{g:02x}{b:02x}"
             else:
-                # For lower whiteness, use ultra-transparent scaling
-                # Ultra-transparent scaling factor (13 -> 3)
-                opacity = max(1, min(255, int(saved_opacity * 3)))
+                # For lower whiteness, use 50% of original scaling
+                # 50% of original scaling factor (3 -> 1.5)
+                opacity = max(1, min(255, int(saved_opacity * 1.5)))
                 ratio = whiteness / 100.0
                 r = int(0x20 + (0xFF - 0x20) * ratio)
                 g = int(0x20 + (0xFF - 0x20) * ratio)
@@ -829,7 +829,7 @@ class LauncherWindow(AcrylicWindow):
 
             # For 100% whiteness, use minimal opacity setting
             if whiteness >= 100:
-                opacity = max(1, min(255, int(saved_opacity * 0.8)))
+                opacity = max(1, min(255, int(saved_opacity * 0.4)))
             alpha = f"{opacity:02x}"
 
             color = f"{base_color}{alpha}"
@@ -888,7 +888,7 @@ class LauncherWindow(AcrylicWindow):
                 start_val = int(0xf3 * 0.55)
                 progress = (ratio - 0.9) / 0.1
                 r = int(start_val + (255 - start_val) * progress)
-                bg_color = f"rgba({r}, {r}, {r}, 0.20)"
+                bg_color = f"rgba({r}, {r}, {r}, 0.10)"
             else:
                 bg_r = int(0x1e + (0xf3 - 0x1e) * ratio)
                 bg_g = int(0x1e + (0xf3 - 0x1e) * ratio)
@@ -896,7 +896,7 @@ class LauncherWindow(AcrylicWindow):
                 container_r = int(bg_r * 0.55)
                 container_g = int(bg_g * 0.55)
                 container_b = int(bg_b * 0.55)
-                bg_color = f"rgba({container_r}, {container_g}, {container_b}, 0.20)"
+                bg_color = f"rgba({container_r}, {container_g}, {container_b}, 0.10)"
             
             border_color = "rgba(255, 255, 255, 0.15)" if is_dark else "rgba(0, 0, 0, 0.1)"
         elif self.current_theme_mode == "black":
