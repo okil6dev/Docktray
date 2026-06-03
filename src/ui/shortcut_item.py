@@ -135,6 +135,17 @@ class ShortcutItem(QWidget):
                 self._apply_icon_size()
                 return
 
+        # Website shortcuts always use the built-in globe icon.
+        if self.path.startswith("url:"):
+            icon = svg_to_icon(ICONS["website"], "#4fc3f7")
+            fallback = icon.pixmap(self.icon_size, self.icon_size)
+            if not fallback.isNull():
+                self._base_pixmap = fallback
+                self._apply_icon_size()
+            else:
+                self.icon_label.setText("WWW")
+            return
+
         pixmap = get_icon(self.path, 'large')
         if pixmap and not pixmap.isNull():
             self._base_pixmap = pixmap
@@ -250,6 +261,20 @@ class ShortcutItem(QWidget):
             app_id = self.path.split(":", 1)[1]
             if app_id:
                 subprocess.Popen(["explorer.exe", f"shell:AppsFolder\\{app_id}"])
+            return
+
+        if self.path.startswith("url:"):
+            url = self.path.split(":", 1)[1]
+            if url:
+                # On Windows, os.startfile opens the URL in the default browser.
+                try:
+                    os.startfile(url)  # type: ignore[attr-defined]
+                    return
+                except Exception:
+                    pass
+                # Fallback: webbrowser uses the OS's default handler.
+                import webbrowser
+                webbrowser.open(url)
             return
 
         if os.path.exists(self.path):

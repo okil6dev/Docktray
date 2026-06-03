@@ -326,6 +326,14 @@ class LauncherWindow(AcrylicWindow):
         self.add_windows_apps_btn.setFixedSize(40, 40)
         self.add_windows_apps_btn.clicked.connect(self._add_windows_app)
 
+        # Add Website Button
+        self.add_website_btn = QToolButton(self)
+        self.add_website_btn.setIcon(svg_to_icon(ICONS["add_website"], "#E0E0E0"))
+        self.add_website_btn.setIconSize(QSize(24, 24))
+        self.add_website_btn.setToolTip("Add Website")
+        self.add_website_btn.setFixedSize(40, 40)
+        self.add_website_btn.clicked.connect(self._add_website)
+
         # Drag Mode Button
         self.drag_mode_btn = QToolButton(self)
         self.drag_mode_btn.setIcon(svg_to_icon(ICONS["drag_mode"], "#E0E0E0"))
@@ -355,6 +363,7 @@ class LauncherWindow(AcrylicWindow):
         self.bottom_layout.addWidget(self.add_file_btn)
         self.bottom_layout.addWidget(self.add_folder_btn)
         self.bottom_layout.addWidget(self.add_windows_apps_btn)
+        self.bottom_layout.addWidget(self.add_website_btn)
         self.bottom_layout.addWidget(self.drag_mode_btn)
         self.bottom_layout.addStretch()
         self.bottom_layout.addWidget(self.settings_btn)
@@ -683,6 +692,7 @@ class LauncherWindow(AcrylicWindow):
         self.add_file_btn.setFixedSize(size, size)
         self.add_folder_btn.setFixedSize(size, size)
         self.add_windows_apps_btn.setFixedSize(size, size)
+        self.add_website_btn.setFixedSize(size, size)
         self.drag_mode_btn.setFixedSize(size, size)
         self.settings_btn.setFixedSize(size, size)
         self.close_btn.setFixedSize(size, size)
@@ -690,6 +700,7 @@ class LauncherWindow(AcrylicWindow):
         self.add_file_btn.setIconSize(QSize(action_icon, action_icon))
         self.add_folder_btn.setIconSize(QSize(action_icon, action_icon))
         self.add_windows_apps_btn.setIconSize(QSize(settings_icon, settings_icon))
+        self.add_website_btn.setIconSize(QSize(settings_icon, settings_icon))
         self.drag_mode_btn.setIconSize(QSize(settings_icon, settings_icon))
         self.settings_btn.setIconSize(QSize(settings_icon, settings_icon))
         self.close_btn.setIconSize(QSize(settings_icon, settings_icon))
@@ -868,6 +879,7 @@ class LauncherWindow(AcrylicWindow):
         self.add_file_btn.setIcon(svg_to_icon(ICONS["add_file"], icon_color))
         self.add_folder_btn.setIcon(svg_to_icon(ICONS["add_folder"], icon_color))
         self.add_windows_apps_btn.setIcon(svg_to_icon(ICONS["windows_apps"], icon_color))
+        self.add_website_btn.setIcon(svg_to_icon(ICONS["add_website"], icon_color))
         self.drag_mode_btn.setIcon(svg_to_icon(ICONS["drag_mode"], icon_color))
         self.settings_btn.setIcon(svg_to_icon(ICONS["settings"], icon_color))
         self.close_btn.setIcon(svg_to_icon(ICONS["close"], icon_color))
@@ -1029,6 +1041,41 @@ class LauncherWindow(AcrylicWindow):
             if selected:
                 self._add_shortcut_path(f'startapp:{selected["app_id"]}', selected["name"])
 
+    def _add_website(self):
+        """Prompt the user for a URL, validate it, and add it as a shortcut."""
+        self._is_dialog_open = True
+        url, ok = QInputDialog.getText(
+            self,
+            "Add Website",
+            "Enter a website URL (e.g. https://example.com):",
+            text="https://",
+        )
+        self._is_dialog_open = False
+        if not ok:
+            return
+        url = (url or "").strip()
+        if not url:
+            return
+        # Auto-prepend https:// if the user typed a bare domain.
+        if "://" not in url:
+            url = "https://" + url
+        # Light validation: must parse as a URL with http(s) scheme.
+        from urllib.parse import urlparse
+        try:
+            parsed = urlparse(url)
+        except Exception:
+            parsed = None
+        if not parsed or parsed.scheme not in ("http", "https") or not parsed.netloc:
+            QMessageBox.warning(
+                self,
+                "Invalid URL",
+                "Please enter a valid http:// or https:// URL.",
+            )
+            return
+        # Derive a friendly default name from the hostname.
+        display_name = parsed.netloc.replace("www.", "")
+        self._add_shortcut_path(f"url:{url}", display_name)
+
     def _get_windows_apps(self):
         command = (
             "Get-StartApps | Sort-Object Name | "
@@ -1064,7 +1111,11 @@ class LauncherWindow(AcrylicWindow):
         if isinstance(path, str) and path.startswith("uwp:{") and "!" not in path:
             # Migrate old non-UWP StartApps entries that were stored as uwp:.
             path = "startapp:" + path[4:]
-        if not (isinstance(path, str) and (path.startswith("startapp:") or path.startswith("uwp:"))):
+        if not (isinstance(path, str) and (
+            path.startswith("startapp:")
+            or path.startswith("uwp:")
+            or path.startswith("url:")
+        )):
             path = os.path.normpath(path)
         if ConfigManager.add_shortcut(path, name):
             self.load_shortcuts()
